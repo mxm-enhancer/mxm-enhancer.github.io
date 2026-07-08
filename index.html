@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musixmatch Power Enhancer - Ultimate Musixmatch Tool & Source ID Fetcher</title>
+    <meta name="description" content="The ultimate Musixmatch tool and userscript. Musixmatch Power Enhancer adds Spotify IDs, metadata badges, Curator shortcuts, and search overlays directly into mxm.">
+    <meta name="keywords" content="musixmatch tool, enhancer mxm, musixmatch, userscript, tampermonkey, curator tool, spotify ids, metadata badges, lyrics tool">
+    <meta name="author" content="mxm-enhancer">
+    <meta property="og:title" content="Musixmatch Power Enhancer Tool">
+    <meta property="og:description" content="Supercharge your Musixmatch experience with the ultimate mxm enhancer. Unlocks source IDs, track metadata badges, and seamless Curators shortcuts.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mxm-enhancer.github.io/">
+    <meta property="og:image" content="https://mxm-enhancer.github.io/img/example.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Musixmatch Power Enhancer Tool">
+    <meta name="twitter:description" content="Supercharge your Musixmatch experience with the ultimate mxm enhancer.">
+    <meta name="twitter:image" content="https://mxm-enhancer.github.io/img/example.png">
+    <meta name="google-site-verification" content="V5l3uz4fkdFWpjfcDvRkui19Z-RgF5LTKXCI4rkwWdM" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF5252;
+            --bg-color: #0f1115;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0aabf;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(255, 82, 82, 0.12), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(66, 133, 244, 0.12), transparent 25%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 92%;
+            margin: 40px auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #FF5252, #FF8A8A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 1s ease-out;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            animation: fadeIn 1.2s ease-out;
+            line-height: 1.6;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 1.8rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .install-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 82, 82, 0.3);
+            margin-top: 3.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 30px rgba(255, 82, 82, 0.5);
+            background: #ff3b3b;
+        }
+
+        .tm-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 2px 6px;
+            background: rgba(255, 82, 82, 0.1);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .tm-link:hover {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ff7676;
+        }
+
+        .carousel-wrapper {
+            margin-top: 3rem;
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+        }
+
+        .carousel-btn.prev { left: 10px; }
+        .carousel-btn.next { right: 10px; }
+
+        .carousel-slide { cursor: pointer; }
+
+        .lightbox {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .lightbox-img {
+            max-width: 95%;
+            max-height: 95vh;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: rgba(255,255,255,0.7);
+            font-size: 40px;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 10000;
+        }
+        .lightbox-close:hover {
+            color: white;
+        }
+        .lightbox-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .lightbox-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+        .lightbox-btn.prev { left: 20px; }
+        .lightbox-btn.next { right: 20px; }
+
+        .footer {
+            margin-top: 4rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .footer a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.2s;
+            border-bottom: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        .footer a:hover {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 82, 82, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .glass-card { padding: 2rem; border-radius: 16px; }
+            .features-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .lightbox-img { max-height: 85vh; }
+        }
+        @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .glass-card { padding: 1.5rem; }
+            .install-btn { padding: 1rem 1.5rem; font-size: 1rem; }
+            .feature-icon { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <button class="lightbox-btn prev" id="lightbox-prev" aria-label="Previous image">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <img class="lightbox-img" id="lightbox-img" src="">
+        <button class="lightbox-btn next" id="lightbox-next" aria-label="Next image">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+    </div>
+    <div class="container">
+        <h1 class="hero-title">Musixmatch Power Enhancer</h1>
+        <p class="hero-subtitle">The ultimate <strong>Musixmatch tool</strong> and Tampermonkey userscript that supercharges your mxm experience. As a powerful <strong>enhancer mxm</strong>, it unlocks Spotify source IDs, track metadata badges, and seamless Curators shortcuts.</p>
+
+        <div class="glass-card">
+            <h2 style="margin-top: 0; font-size: 1.6rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">Musixmatch Enhancer Core Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">🎧</span>
+                    <span class="feature-title">Connected Sources</span>
+                    <span class="feature-desc">Instantly view and copy Spotify, Apple Music, and Amazon Music IDs linked to albums, artists, and tracks.</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-title">Enhanced Metadata</span>
+                    <span class="feature-desc">See exact release dates, ISRCs, common track IDs (Abstrack), and clear visual badges for lyrics and structure.</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🛠️</span>
+                    <span class="feature-title">Curators Tools</span>
+                    <span class="feature-desc">Drafts manager, published state locks, and ultra-fast navigation shortcuts embedded directly into the Curators interface.</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🗺️</span>
+                    <span class="feature-title">Availability Maps</span>
+                    <span class="feature-desc">One-click access to Spotify Availability Map to quickly verify region locks for any track or album.</span>
+                </div>
+            </div>
+            
+            <div class="carousel-wrapper">
+                <button class="carousel-btn prev" aria-label="Previous image">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="carousel-track">
+                    <img src="img/example.png" alt="Musixmatch Power Enhancer - Album View showing Spotify IDs" class="carousel-slide">
+                    <img src="img/example2.png" alt="Musixmatch Tool - Search View with enhanced metadata" class="carousel-slide">
+                    <img src="img/example3.png" alt="Enhancer MXM - Curators View with quick shortcuts" class="carousel-slide">
+                    <img src="img/example4.png" alt="Musixmatch Enhancer Userscript - Track View details" class="carousel-slide">
+                </div>
+                <button class="carousel-btn next" aria-label="Next image">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="https://raw.githubusercontent.com/mxm-enhancer/mxm-enhancer/main/musixmatch-power-enhancer.user.js" class="install-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Install Userscript
+                </a>
+                <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">Requires the <a href="https://www.tampermonkey.net/" target="_blank" class="tm-link">Tampermonkey</a> extension</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Open source on <a href="https://github.com/mxm-enhancer/mxm-enhancer" target="_blank">GitHub</a> • <i>Independent project — not created by, sponsored by, or connected to Musixmatch.</i></p>
+        </div>
+    </div>
+    <script>
+        const track = document.querySelector('.carousel-track');
+        const slides = Array.from(track.children);
+        const nextButton = document.querySelector('.carousel-btn.next');
+        const prevButton = document.querySelector('.carousel-btn.prev');
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+        });
+
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel();
+        });
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+        }, 5000);
+
+        // Lightbox logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const closeBtn = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        let lightboxIndex = 0;
+
+        function updateLightboxImage() {
+            lightboxImg.src = slides[lightboxIndex].src;
+        }
+
+        slides.forEach((slide, index) => {
+            slide.addEventListener('click', () => {
+                lightboxIndex = index;
+                updateLightboxImage();
+                lightbox.classList.add('active');
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+            }
+        });
+        
+        lightboxPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex - 1 + slides.length) % slides.length;
+            updateLightboxImage();
+        });
+
+        lightboxNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex + 1) % slides.length;
+            updateLightboxImage();
+        });
+
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') {
+                lightbox.classList.remove('active');
+            } else if (e.key === 'ArrowLeft') {
+                lightboxIndex = (lightboxIndex - 1 + slides.length) % slides.length;
+                updateLightboxImage();
+            } else if (e.key === 'ArrowRight') {
+                lightboxIndex = (lightboxIndex + 1) % slides.length;
+                updateLightboxImage();
+            }
+        });
+    </script>
+</body>
+</html>
